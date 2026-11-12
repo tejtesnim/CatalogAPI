@@ -1,3 +1,4 @@
+
 using Microsoft.EntityFrameworkCore;
 using ProductCatalog.Api.Data;
 using ProductCatalog.Api.Models;
@@ -38,7 +39,7 @@ app.MapGet("/health", () =>
     .WithName("HealthCheck");
 
 // GET Products
-app.MapGet("/api/products", async (AppDbContext db) =>
+app.MapGet("/api/get-all-products", async (AppDbContext db) =>
 {
     return await db.Products
         .AsNoTracking()
@@ -47,7 +48,7 @@ app.MapGet("/api/products", async (AppDbContext db) =>
 .WithName("GetAllProducts");
 
 // POST Product
-app.MapPost("/api/products", async (Product product, AppDbContext db) =>
+app.MapPost("/api/create-product", async (Product product, AppDbContext db) =>
 {
     db.Products.Add(product);
 
@@ -77,6 +78,5 @@ app.MapGet("/api/get-product/{id:int}", async (int id, AppDbContext db) =>
     return Results.Ok(product);
 })
 .WithName("GetProductById");
-
 
 app.Run();
