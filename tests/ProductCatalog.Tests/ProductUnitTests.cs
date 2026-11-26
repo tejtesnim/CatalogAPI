@@ -105,7 +105,7 @@ public class ProductUnitTests
         Assert.NotNull(products);
         Assert.Single(products);
 
-        Assert.Equal("Ecran 27 pouces", products[0].Name);
+        Assert.Equal("Souris sans fil", products[0].Name);
         Assert.Equal(250.00m, products[0].Price);
     }
 }
