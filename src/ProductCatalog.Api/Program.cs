@@ -22,21 +22,27 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Création automatique de la base de données
-using (var scope = app.Services.CreateScope())
+// Création automatique de la base
+// Ne pas exécuter pendant les tests
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.EnsureCreated();
+    }
 }
 
 // Health Check
 app.MapGet("/health", () =>
-    Results.Ok(new
+{
+    return Results.Ok(new
     {
         status = "Healthy",
         timestamp = DateTime.UtcNow
-    }))
-    .WithName("HealthCheck");
+    });
+})
+.WithName("HealthCheck");
 
 // GET Products
 app.MapGet("/api/get-all-products", async (AppDbContext db) =>
@@ -61,6 +67,7 @@ app.MapPost("/api/create-product", async (Product product, AppDbContext db) =>
 })
 .WithName("CreateProduct");
 
+// GET Product By ID
 app.MapGet("/api/get-product/{id:int}", async (int id, AppDbContext db) =>
 {
     var product = await db.Products
@@ -101,3 +108,6 @@ app.MapDelete("/api/products/{id:int}", async (int id, AppDbContext db) =>
 // Test des pull requests !!!
 
 app.Run();
+
+// Permet au projet de tests d'accéder à Program
+public partial class Program { }
