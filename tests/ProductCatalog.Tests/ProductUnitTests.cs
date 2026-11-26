@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using ProductCatalog.Api;
 using ProductCatalog.Api.Data;
 using ProductCatalog.Api.Models;
 using Xunit;
@@ -15,13 +16,13 @@ namespace ProductCatalog.Tests;
 
 public class ProductUnitTests
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly WebApplicationFactory<ApiAssemblyMarker> _factory;
 
     public ProductUnitTests()
     {
         var databaseName = "UnitTestingDb_" + Guid.NewGuid();
 
-        _factory = new WebApplicationFactory<Program>()
+        _factory = new WebApplicationFactory<ApiAssemblyMarker>()
             .WithWebHostBuilder(builder =>
             {
                 builder.UseEnvironment("Testing");

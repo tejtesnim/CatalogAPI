@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using ProductCatalog.Api;
 using ProductCatalog.Api.Data;
 using ProductCatalog.Api.Models;
 using Xunit;
@@ -14,14 +15,13 @@ using Xunit;
 namespace ProductCatalog.Tests;
 
 public class ProductIntegrationTests :
-    IClassFixture<WebApplicationFactory<Program>>
+    IClassFixture<WebApplicationFactory<ApiAssemblyMarker>>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly WebApplicationFactory<ApiAssemblyMarker> _factory;
 
     public ProductIntegrationTests(
-        WebApplicationFactory<Program> factory)
+        WebApplicationFactory<ApiAssemblyMarker> factory)
     {
-        // Récupération de la chaîne de connexion
         var connectionString =
             Environment.GetEnvironmentVariable(
                 "ConnectionStrings__CatalogDbConnection")
@@ -31,11 +31,9 @@ public class ProductIntegrationTests :
         {
             builder.ConfigureServices(services =>
             {
-                // Supprimer la configuration précédente du DbContext
                 services.RemoveAll<AppDbContext>();
                 services.RemoveAll<DbContextOptions<AppDbContext>>();
 
-                // Utiliser le vrai SQL Server
                 services.AddDbContext<AppDbContext>(options =>
                 {
                     options.UseSqlServer(connectionString);
@@ -44,7 +42,6 @@ public class ProductIntegrationTests :
         });
     }
 
-    // Test d'intégration : vérifier la persistance dans SQL Server
     [Fact]
     public async Task AddProduct_And_VerifyPersistenceInRealDatabase()
     {
@@ -59,7 +56,6 @@ public class ProductIntegrationTests :
             Price = 1299.99m
         };
 
-        // 1. Insertion via l'endpoint API
         var postResponse = await client.PostAsJsonAsync(
             "/api/create-product",
             product
@@ -67,7 +63,6 @@ public class ProductIntegrationTests :
 
         Assert.Equal(HttpStatusCode.Created, postResponse.StatusCode);
 
-        // 2. Vérification directe dans SQL Server
         using var scope = _factory.Services.CreateScope();
 
         var db = scope.ServiceProvider
@@ -77,7 +72,6 @@ public class ProductIntegrationTests :
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Name == uniqueName);
 
-        // 3. Vérification de la persistance
         Assert.NotNull(persistedProduct);
         Assert.Equal(uniqueName, persistedProduct.Name);
         Assert.Equal(1299.99m, persistedProduct.Price);
