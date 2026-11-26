@@ -32,4 +32,4 @@ jobs:
 
       # 5. Exécution des tests unitaires uniquement
       - name: Run Unit Tests
-        run: dotnet test tests/ProductCatalog.Tests/ProductCatalog.Tests.csproj --filter "FullyQualifiedName~ProductUnitTests" --configuration Release --no-build
+        run: dotnet test tests/ProductCatalog.Tests/ProductCatalog.Tests.csproj --filter "FullyQualifiedName~ProductUnitTests" --configuration Release --no-build --logger "console;verbosity=detailed"
